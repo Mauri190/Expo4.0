@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda 2025 - AutoManager</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-calendar-check"></i> Agenda 2025 - AutoManager
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="inicio.html">
+                            <i class="bi bi-arrow-left"></i> Volver al Dashboard
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <section id="agenda" class="content-section">
+            <div class="section-header">
+                <h2><i class="bi bi-calendar-check"></i> Agenda 2025</h2>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="calendar">
+                        <div class="calendar-header">
+                            <button class="btn btn-sm btn-outline-primary prev-month">&lt;</button>
+                            <h4 class="month-year" id="currentMonthYear">Enero 2025</h4>
+                            <button class="btn btn-sm btn-outline-primary next-month">&gt;</button>
+                        </div>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Dom</th><th>Lun</th><th>Mar</th><th>Mié</th><th>Jue</th><th>Vie</th><th>Sáb</th>
+                                </tr>
+                            </thead>
+                            <tbody id="calendarBody">
+                                </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h5>Eventos próximos</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group" id="upcomingEvents">
+                                <div class="list-group-item text-center text-muted">
+                                    Cargando eventos...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Nueva cita</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="appointmentForm">
+                                <div class="mb-3">
+                                    <label for="appointmentVehicle" class="form-label">Vehículo</label>
+                                    <select class="form-select" id="appointmentVehicle" required>
+                                        <option value="">Seleccionar vehículo...</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="appointmentDate" class="form-label">Fecha</label>
+                                    <input type="date" class="form-control" id="appointmentDate" required min="2025-01-01" max="2025-12-31">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="appointmentTime" class="form-label">Hora</label>
+                                    <input type="time" class="form-control" id="appointmentTime" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="appointmentType" class="form-label">Tipo de servicio</label>
+                                    <select class="form-select" id="appointmentType" required>
+                                        <option value="">Seleccionar...</option>
+                                        <option value="mantenimiento">Mantenimiento regular</option>
+                                        <option value="reparacion">Reparación</option>
+                                        <option value="lavado">Lavado y detailing</option>
+                                        <option value="inspeccion">Inspección técnica</option>
+                                        <option value="otros">Otros</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="appointmentLocation" class="form-label">Taller/Ubicación</label>
+                                    <input type="text" class="form-control" id="appointmentLocation" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="appointmentNotes" class="form-label">Notas</label>
+                                    <textarea class="form-control" id="appointmentNotes" rows="3"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="bi bi-calendar-plus"></i> Agendar cita
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="bi bi-calendar-check"></i> Agenda 2025 - AutoManager</h5>
+                    <p>Gestiona tus citas de mantenimiento para el año 2025.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p>&copy; 2025 AutoManager. Todos los derechos reservados.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+    // Variables globales
+    let vehicles = [];
+    let appointments = [];
+    let currentDate = new Date(2025, 0, 1); // Enero 2025
+    let selectedDate = new Date();
+
+    // Cargar datos desde localStorage
+    function loadData() {
+        const savedVehicles = localStorage.getItem('vehicles');
+        const savedAppointments = localStorage.getItem('appointments');
+        
+        if (savedVehicles) {
+            vehicles = JSON.parse(savedVehicles);
+        }
+        
+        if (savedAppointments) {
+            appointments = JSON.parse(savedAppointments);
+            // Filtrar solo citas del año 2025
+            appointments = appointments.filter(app => {
+                const appDate = new Date(app.date);
+                return appDate.getFullYear() === 2025;
+            });
+        }
+        
+        loadVehicles();
+        generateCalendar();
+        updateUpcomingEvents();
+    }
+
+    // Generar calendario
+    function generateCalendar() {
+        const calendarBody = document.getElementById('calendarBody');
+        const monthYearElement = document.getElementById('currentMonthYear');
+        
+        // Establecer texto del mes y año
+        const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+                           "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+        monthYearElement.textContent = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+        
+        // Limpiar calendario
+        calendarBody.innerHTML = '';
+        
+        // Obtener primer día del mes y último día del mes
+        const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+        const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+        
+        let firstDayIndex = firstDay.getDay();
+        const prevMonthLastDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0).getDate();
+        
+        let dayCount = 1;
+        let html = '';
+        
+        for (let i = 0; i < 6; i++) {
+            let row = '<tr>';
+            
+            for (let j = 0; j < 7; j++) {
+                if (i === 0 && j < firstDayIndex) {
+                    const day = prevMonthLastDay - (firstDayIndex - j - 1);
+                    row += `<td class="text-muted">${day}</td>`;
+                } else if (dayCount > lastDay.getDate()) {
+                    const day = dayCount - lastDay.getDate();
+                    row += `<td class="text-muted">${day}</td>`;
+                    dayCount++;
+                } else {
+                    const today = new Date();
+                    const isToday = dayCount === today.getDate() && 
+                                   currentDate.getMonth() === today.getMonth() && 
+                                   currentDate.getFullYear() === today.getFullYear();
+                    
+                    const isSelected = dayCount === selectedDate.getDate() && 
+                                     currentDate.getMonth() === selectedDate.getMonth() && 
+                                     currentDate.getFullYear() === selectedDate.getFullYear();
+                    
+                    const hasEvent = hasEventOnDate(dayCount);
+                    
+                    let classNames = 'calendar-day';
+                    if (isToday) classNames += ' today';
+                    if (isSelected) classNames += ' selected';
+                    if (hasEvent) classNames += ' has-event';
+                    
+                    row += `<td class="${classNames}" data-day="${dayCount}">${dayCount}</td>`;
+                    dayCount++;
+                }
+            }
+            
+            row += '</tr>';
+            html += row;
+            
+            if (dayCount > lastDay.getDate()) {
+                break;
+            }
+        }
+        
+        calendarBody.innerHTML = html;
+        
+        document.querySelectorAll('.calendar-day').forEach(day => {
+            day.addEventListener('click', function() {
+                selectDay(parseInt(this.dataset.day));
+            });
+        });
+    }
+
+    function hasEventOnDate(day) {
+        const dateStr = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+        return appointments.some(app => app.date === dateStr);
+    }
+
+    function selectDay(day) {
+        selectedDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+        document.getElementById('appointmentDate').value = 
+            `${selectedDate.getFullYear()}-${(selectedDate.getMonth() + 1).toString().padStart(2, '0')}-${selectedDate.getDate().toString().padStart(2, '0')}`;
+        generateCalendar();
+    }
+
+    document.querySelector('.prev-month').addEventListener('click', function() {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        generateCalendar();
+    });
+
+    document.querySelector('.next-month').addEventListener('click', function() {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        generateCalendar();
+    });
+
+    function loadVehicles() {
+        const appointmentVehicleSelect = document.getElementById('appointmentVehicle');
+        appointmentVehicleSelect.innerHTML = '<option value="">Seleccionar vehículo...</option>';
+        if (vehicles.length === 0) return;
+        
+        vehicles.forEach(vehicle => {
+            const option = document.createElement('option');
+            option.value = vehicle.id;
+            option.textContent = `${vehicle.brand} ${vehicle.model} (${vehicle.plate})`;
+            appointmentVehicleSelect.appendChild(option);
+        });
+    }
+
+    function updateUpcomingEvents() {
+        const upcomingEventsContainer = document.getElementById('upcomingEvents');
+        upcomingEventsContainer.innerHTML = '';
+        
+        if (appointments.length === 0) {
+            upcomingEventsContainer.innerHTML = '<div class="list-group-item text-center text-muted">No hay eventos próximos</div>';
+            return;
+        }
+        
+        const now = new Date();
+        const futureAppointments = appointments
+            .filter(a => new Date(a.date) >= now)
+            .sort((a, b) => new Date(a.date) - new Date(b.date));
+        
+        if (futureAppointments.length === 0) {
+            upcomingEventsContainer.innerHTML = '<div class="list-group-item text-center text-muted">No hay eventos próximos</div>';
+            return;
+        }
+        
+        futureAppointments.slice(0, 5).forEach(appointment => {
+            const eventItem = document.createElement('div');
+            eventItem.className = 'list-group-item upcoming-event';
+            eventItem.innerHTML = `
+                <div class="d-flex w-100 justify-content-between">
+                    <h6 class="mb-1">${getAppointmentTypeName(appointment.type)}</h6>
+                    <small class="text-muted">${formatDate(appointment.date)} - ${appointment.time}</small>
+                </div>
+                <p class="mb-1">Taller: ${appointment.location}</p>
+                <small class="text-muted">Vehículo: ${appointment.vehicleName}</small>
+            `;
+            upcomingEventsContainer.appendChild(eventItem);
+        });
+    }
+
+    function getAppointmentTypeName(type) {
+        const types = {
+            'mantenimiento': 'Mantenimiento regular',
+            'reparacion': 'Reparación',
+            'lavado': 'Lavado y detailing',
+            'inspeccion': 'Inspección técnica',
+            'otros': 'Otros servicios'
+        };
+        return types[type] || type;
+    }
+
+    function formatDate(dateString) {
+        const options = { year: 'numeric', month: 'short', day: 'numeric' };
+        return new Date(dateString).toLocaleDateString('es-ES', options);
+    }
+
+    document.getElementById('appointmentForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const vehicleId = document.getElementById('appointmentVehicle').value;
+        const date = document.getElementById('appointmentDate').value;
+        const time = document.getElementById('appointmentTime').value;
+        const type = document.getElementById('appointmentType').value;
+        const location = document.getElementById('appointmentLocation').value;
+        const notes = document.getElementById('appointmentNotes').value;
+        
+        const appointmentYear = new Date(date).getFullYear();
+        if (appointmentYear !== 2025) {
+            alert('Por favor selecciona una fecha del año 2025');
+            return;
+        }
+        
+        const vehicle = vehicles.find(v => v.id === vehicleId);
+        if (!vehicle) {
+            alert('Por favor selecciona un vehículo válido');
+            return;
+        }
+        
+        const appointment = {
+            id: Date.now().toString(),
+            vehicleId,
+            vehicleName: `${vehicle.brand} ${vehicle.model}`,
+            date, time, type, location, notes,
+            createdAt: new Date().toISOString()
+        };
+        
+        appointments.push(appointment);
+        localStorage.setItem('appointments', JSON.stringify(appointments));
+        updateUpcomingEvents();
+        generateCalendar();
+        alert(`Cita agendada para el ${date} a las ${time}`);
+        this.reset();
+        
+        document.getElementById('appointmentDate').value = 
+            `${selectedDate.getFullYear()}-${(selectedDate.getMonth() + 1).toString().padStart(2, '0')}-${selectedDate.getDate().toString().padStart(2, '0')}`;
+    });
+
+    loadData();
+    
+    const today = new Date();
+    if (today.getFullYear() === 2025) {
+        selectedDate = today;
+        document.getElementById('appointmentDate').value = 
+            `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
+    } else {
+        selectDay(1); // Selecciona el 1 de enero de 2025 por defecto
+    }
+});
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
