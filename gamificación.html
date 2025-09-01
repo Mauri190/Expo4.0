@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kiroo - Gamificación</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #d32f2f;
+            --secondary-color: #b71c1c;
+            --accent-color: #f44336;
+            --light-color: #121212;
+            --dark-color: #000000;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --danger-color: #ff5252;
+            --text-color: #ffffff;
+            --card-bg: #1e1e1e;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-color);
+            color: var(--text-color);
+        }
+
+        .navbar {
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            background-color: var(--primary-color) !important;
+        }
+
+        .navbar-brand {
+            font-weight: 600;
+            color: var(--text-color) !important;
+        }
+
+        .navbar-brand i {
+            margin-right: 8px;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.85) !important;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--text-color) !important;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+
+        .content-section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .section-header h2 {
+            margin-bottom: 0;
+            color: var(--text-color);
+            font-weight: 600;
+        }
+        
+        .section-header h2 i {
+            margin-right: 10px;
+        }
+
+        .btn-back {
+            margin-right: 15px;
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .btn-back:hover {
+            background-color: var(--primary-color);
+            color: var(--text-color);
+        }
+
+        /* Juegos */
+        .game-card {
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            height: 100%;
+            cursor: pointer;
+            background-color: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0,0,0,0.3);
+            background-color: #252525;
+        }
+
+        .game-icon {
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: white;
+        }
+
+        .bg-quiz { background-color: #c62828; }
+        .bg-memory { background-color: #b71c1c; }
+        .bg-dragdrop { background-color: #d32f2f; }
+        .bg-wordsearch { background-color: #e53935; }
+        .bg-simulator { background-color: #f44336; }
+        .bg-trivia { background-color: #ff5252; }
+
+        .game-card .card-body {
+            background-color: transparent;
+            color: var(--text-color);
+        }
+
+        /* Quiz */
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Memorama */
+        .memory-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 0 auto;
+        }
+
+        .memory-card {
+            aspect-ratio: 1;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .memory-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .memory-card.flipped .memory-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .memory-card-front, .memory-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        .memory-card-front {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .memory-card-front i {
+            font-size: 2rem;
+        }
+
+        .memory-card-back {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            transform: rotateY(180deg);
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .memory-card-back i {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .memory-card-back span {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .memory-card-back small {
+            font-size: 0.7rem;
+            color: #cccccc;
+        }
+
+        /* Arrastrar y soltar */
+        .dragdrop-pieces {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            padding: 15px;
+            background-color: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            min-height: 200px;
+        }
+
+        .dragdrop-target {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            padding: 15px;
+            background-color: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            min-height: 300px;
+            border: 2px dashed rgba(255,255,255,0.2);
+        }
+
+        .dragdrop-piece {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            cursor: move;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: all 0.2s;
+            color: var(--text-color);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .dragdrop-piece:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            background-color: #252525;
+        }
+
+        .dragdrop-piece i {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .dragdrop-slot {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 80px;
+            border: 2px dashed rgba(255,255,255,0.2);
+            transition: all 0.2s;
+            color: var(--text-color);
+        }
+
+        .dragdrop-slot.highlight {
+            border-color: var(--primary-color);
+            background-color: rgba(211, 47, 47, 0.1);
+        }
+
+        .dragdrop-slot.correct {
+            border-color: var(--success-color);
+            background-color: rgba(76, 175, 80, 0.1);
+        }
+
+        .dragdrop-slot.incorrect {
+            border-color: var(--danger-color);
+            background-color: rgba(255, 82, 82, 0.1);
+        }
+
+        /* Sopa de letras */
+        .word-search-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .word-search-grid {
+            display: grid;
+            grid-template-columns: repeat(15, 30px);
+            grid-template-rows: repeat(15, 30px);
+            gap: 2px;
+            margin: 20px auto;
+        }
+
+        .word-search-cell {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            color: var(--text-color);
+        }
+
+        .word-search-cell.selected {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .word-search-cell.found {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .word-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .word-item {
+            padding: 5px 10px;
+            background-color: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: var(--text-color);
+        }
+
+        .word-item.found {
+            background-color: var(--success-color);
+            color: white;
+            text-decoration: line-through;
+        }
+
+        /* Sopa de letras nueva versión */
+        .wordsearch-grid-new {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 2px;
+            margin: 0 auto;
+            max-width: 600px;
+        }
+
+        .wordsearch-cell-new {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.1);
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s;
+            color: var(--text-color);
+        }
+
+        .wordsearch-cell-new:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        .wordsearch-cell-new.selected {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .wordsearch-cell-new.found {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .wordsearch-words {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .wordsearch-word {
+            padding: 5px 10px;
+            background-color: rgba(255,255,255,0.05);
+            border-radius: 4px;
+            transition: all 0.2s;
+            color: var(--text-color);
+        }
+
+        .wordsearch-word.found {
+            text-decoration: line-through;
+            color: #999;
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        footer {
+            background-color: var(--dark-color);
+            border-top: 1px solid #333;
+        }
+
+        footer h5 {
+            color: var(--text-color);
+            font-weight: 600;
+        }
+
+        footer a {
+            text-decoration: none;
+            transition: color 0.2s;
+            color: #cccccc !important;
+        }
+
+        footer a:hover {
+            color: var(--accent-color) !important;
+        }
+
+        footer p {
+            color: #cccccc;
+        }
+
+        /* Juego contenedor */
+        .game-container {
+            margin-top: 30px;
+        }
+
+        /* Cards */
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-color);
+        }
+        
+        .card-header {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-color);
+        }
+
+        /* Botones */
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: var(--text-color);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .btn-outline-secondary {
+            color: #cccccc;
+            border-color: #cccccc;
+        }
+        
+        .btn-outline-secondary:hover {
+            background-color: #cccccc;
+            border-color: #cccccc;
+            color: var(--dark-color);
+        }
+        
+        .btn-outline-danger {
+            color: var(--danger-color);
+            border-color: var(--danger-color);
+        }
+        
+        .btn-outline-danger:hover {
+            background-color: var(--danger-color);
+            border-color: var(--danger-color);
+            color: var(--text-color);
+        }
+
+        /* Progress bar */
+        .progress {
+            background-color: rgba(255,255,255,0.1);
+        }
+        
+        .progress-bar {
+            background-color: var(--primary-color);
+        }
+
+        /* Textos generales */
+        h3, h4, h5, h6 {
+            color: var(--text-color);
+        }
+        
+        .text-muted {
+            color: #888 !important;
+        }
+        
+        .border.rounded {
+            border-color: rgba(255,255,255,0.1) !important;
+        }
+        
+        .bg-primary {
+            background-color: var(--primary-color) !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .memory-board {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .btn-back {
+                margin-bottom: 15px;
+                margin-right: 0;
+            }
+            
+            .dragdrop-pieces, .dragdrop-target {
+                grid-template-columns: 1fr;
+            }
+            
+            .wordsearch-grid-new {
+                grid-template-columns: repeat(10, 1fr);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .wordsearch-grid-new {
+                grid-template-columns: repeat(8, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Barra de navegación -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="bi bi-car-front-fill"></i> Kiroo
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Inicio</a></li>
+                    <li class="nav-item"><a class="nav-link" href="agenda.html">Agenda</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="gamificacion.html">Gamificación</a></li>
+                    <li class="nav-item"><a class="nav-link" href="vehiculos.html">Mis Vehículos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="emergencias.html">Emergencias</a></li>
+                </ul>
+                <div class="dropdown">
+                    <button class="btn btn-outline-light dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown">
+                        <i class="bi bi-gear"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-sliders"></i> Ajustes</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido principal -->
+    <div class="container mt-4">
+        <!-- Sección de Gamificación -->
+        <section id="gamificacion" class="content-section">
+            <div class="section-header">
+                <button class="btn btn-back btn-outline-primary" onclick="window.location.href='index.html'">
+                    <i class="bi bi-arrow-left"></i> Volver
+                </button>
+                <h2><i class="bi bi-joystick"></i> Gamificación</h2>
+            </div>
+            
+            <div class="row g-4 mb-5">
+                <div class="col-md-4">
+                    <div class="game-card card" onclick="startGame('quiz')">
+                        <div class="game-icon bg-quiz">
+                            <i class="bi bi-question-circle"></i>
+                        </div>
+                        <div class="card-body text-center">
+                            <h4>Quiz de autos</h4>
+                            <p>Pon a prueba tus conocimientos sobre vehículos</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="game-card card" onclick="startGame('memory')">
+                        <div class="game-icon bg-memory">
+                            <i class="bi bi-collection"></i>
+                        </div>
+                        <div class="card-body text-center">
+                            <h4>Memoria de partes</h4>
+                            <p>Encuentra las parejas de partes del automóvil</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="game-card card" onclick="startGame('dragdrop')">
+                        <div class="game-icon bg-dragdrop">
+                            <i class="bi bi-arrow-down-up"></i>
+                        </div>
+                        <div class="card-body text-center">
+                            <h4>Arma el motor</h4>
+                            <p>Coloca las piezas en el lugar correcto</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="game-card card" onclick="startGame('wordsearch')">
+                        <div class="game-icon bg-wordsearch">
+                            <i class="bi bi-search"></i>
+                        </div>
+                        <div class="card-body text-center">
+                            <h4>Sopa de letras</h4>
+                            <p>Encuentra términos automotrices</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="game-card card" onclick="startGame('simulator')">
+                        <div class="game-icon bg-simulator">
+                            <i class="bi bi-speedometer2"></i>
+                        </div>
+                        <div class="card-body text-center">
+                            <h4>Simulador</h4>
+                            <p>Realiza tareas de mantenimiento virtual</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="game-card card" onclick="startGame('trivia')">
+                        <div class="game-icon bg-trivia">
+                            <i class="bi bi-trophy"></i>
+                        </div>
+                        <div class="card-body text-center">
+                            <h4>Trivia</h4>
+                            <p>Responde preguntas contra reloj</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Juego: Quiz -->
+            <div id="quiz-game" class="game-container" style="display: none;">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3>Quiz de autos</h3>
+                        <div>
+                            <button class="btn btn-outline-secondary me-2" onclick="resetQuiz()">
+                                <i class="bi bi-arrow-clockwise"></i> Reiniciar
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="closeGame('quiz')">
+                                <i class="bi bi-x-lg"></i> Cerrar
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="quizContainer">
+                            <div class="progress mb-3">
+                                <div id="quizProgress" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                            </div>
+                            <h6 id="quizQuestion"></h6>
+                            <div class="quiz-options mt-3" id="quizOptions"></div>
+                            <button class="btn btn-primary mt-3 w-100" id="nextQuestion">Siguiente</button>
+                        </div>
+                        <div id="quizResults" style="display: none;">
+                            <div class="text-center py-4">
+                                <i class="bi bi-trophy-fill text-warning" style="font-size: 3rem;"></i>
+                                <h4 class="mt-3">¡Quiz completado!</h4>
+                                <p>Tu puntuación: <span id="quizScore" class="fw-bold">0</span>/<span id="quizTotal">0</span></p>
+                                <div id="quizFeedback"></div>
+                                <div class="d-grid gap-2 mt-4">
+                                    <button class="btn btn-primary" onclick="retryQuiz()">Intentar de nuevo</button>
+                                    <button class="btn btn-outline-secondary" onclick="closeGame('quiz')">Volver a juegos</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Juego: Memoria -->
+            <div id="memory-game" class="game-container" style="display: none;">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3>Memoria de partes</h3>
+                        <div>
+                            <button class="btn btn-outline-secondary me-2" onclick="resetMemory()">
+                                <i class="bi bi-arrow-clockwise"></i> Reiniciar
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="closeGame('memory')">
+                                <i class="bi bi-x-lg"></i> Cerrar
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>Intentos: <span id="memoryAttempts">0</span></div>
+                            <div>Pares encontrados: <span id="memoryMatches">0</span>/8</div>
+                        </div>
+                        <div class="memory-board" id="memoryBoard"></div>
+                        <div id="memoryResults" style="display: none;" class="text-center py-4">
+                            <i class="bi bi-stars text-warning" style="font-size: 3rem;"></i>
+                            <h4 class="mt-3">¡Felicidades!</h4>
+                            <p>Completaste el memorama en <span id="finalAttempts" class="fw-bold">0</span> intentos</p>
+                            <div class="d-grid gap-2 mt-4">
+                                <button class="btn btn-primary" onclick="setupMemoryGame()">Jugar de nuevo</button>
+                                <button class="btn btn-outline-secondary" onclick="closeGame('memory')">Volver a juegos</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Juego: Arrastrar y soltar -->
+            <div id="dragdrop-game" class="game-container" style="display: none;">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3>Arma el motor</h3>
+                        <div>
+                            <button class="btn btn-outline-secondary me-2" onclick="resetDragdrop()">
+                                <i class="bi bi-arrow-clockwise"></i> Reiniciar
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="closeGame('dragdrop')">
+                                <i class="bi bi-x-lg"></i> Cerrar
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="dragdropContainer">
+                            <p class="text-center">Arrastra cada pieza a su lugar correcto en el motor</p>
+                            <div class="row mt-4">
+                                <div class="col-md-6">
+                                    <h6 class="text-center mb-3">Piezas</h6>
+                                    <div class="dragdrop-pieces" id="dragdropPieces"></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="text-center mb-3">Motor</h6>
+                                    <div class="dragdrop-target" id="dragdropTarget"></div>
+                                </div>
+                            </div>
+                            <div class="text-center mt-4">
+                                <button class="btn btn-primary" id="checkDragdrop">Verificar</button>
+                                <div id="dragdropFeedback" class="mt-3"></div>
+                            </div>
+                        </div>
+                        <div id="dragdropResults" style="display: none;" class="text-center py-4">
+                            <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
+                            <h4 class="mt-3">¡Motor ensamblado correctamente!</h4>
+                            <div class="d-grid gap-2 mt-4">
+                                <button class="btn btn-primary" onclick="setupDragdropGame()">Jugar de nuevo</button>
+                                <button class="btn btn-outline-secondary" onclick="closeGame('dragdrop')">Volver a juegos</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Juego: Sopa de letras -->
+            <div id="wordsearch-game" class="game-container" style="display: none;">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3>Sopa de letras</h3>
+                        <div>
+                            <button class="btn btn-outline-secondary me-2" onclick="resetWordSearch()">
+                                <i class="bi bi-arrow-clockwise"></i> Reiniciar
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="closeGame('wordsearch')">
+                                <i class="bi bi-x-lg"></i> Cerrar
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="wordsearchContainer">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>Palabras encontradas: <span id="wordsFound">0</span>/<span id="totalWords">0</span></div>
+                                <button class="btn btn-sm btn-outline-primary" onclick="showWordsearchWords()">Mostrar palabras</button>
+                            </div>
+                            <div class="wordsearch-grid-new" id="wordsearchGrid"></div>
+                            <div class="wordsearch-words" id="wordsearchWords"></div>
+                        </div>
+                        <div id="wordsearchResults" style="display: none;" class="text-center py-4">
+                            <i class="bi bi-emoji-smile-fill text-warning" style="font-size: 3rem;"></i>
+                            <h4 class="mt-3">¡Sopa de letras completada!</h4>
+                            <div class="d-grid gap-2 mt-4">
+                                <button class="btn btn-primary" onclick="setupWordsearchGame()">Jugar de nuevo</button>
+                                <button class="btn btn-outline-secondary" onclick="closeGame('wordsearch')">Volver a juegos</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Juego: Simulador -->
+            <div id="simulator-game" class="game-container" style="display: none;">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3>Simulador de mantenimiento</h3>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="closeGame('simulator')">
+                            <i class="bi bi-x-lg"></i> Cerrar
+                        </button>
+                    </div>
+                    <div class="card-body text-center">
+                        <h4>Próximamente...</h4>
+                        <p>Estamos trabajando en un emocionante simulador de mantenimiento.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Juego: Trivia -->
+            <div id="trivia-game" class="game-container" style="display: none;">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3>Trivia automotriz</h3>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="closeGame('trivia')">
+                            <i class="bi bi-x-lg"></i> Cerrar
+                        </button>
+                    </div>
+                    <div class="card-body text-center">
+                        <h4>Próximamente...</h4>
+                        <p>Estamos trabajando en una emocionante trivia automotriz.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="bi bi-car-front-fill"></i> Kiroo</h5>
+                    <p>La mejor aplicación para la gestión y mantenimiento de tu vehículo.</p>
+                </div>
+                <div class="col-md-3">
+                    <h5>Enlaces</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="agenda.html" class="text-white">Agenda</a></li>
+                        <li><a href="vehiculos.html" class="text-white">Mis Vehículos</a></li>
+                        <li><a href="emergencias.html" class="text-white">Emergencias</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>Contacto</h5>
+                    <p><i class="bi bi-envelope"></i> contacto@Kiroo.com</p>
+                </div>
+            </div>
+            <div class="text-center mt-3">
+                <p>&copy; 2025 Kiroo. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Variables globales para los juegos
+        let currentQuestion = 0;
+        let score = 0;
+        let selectedOption = null;
+        let memoryCards = [];
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let attempts = 0;
+        let foundWords = [];
+        let selectedCells = [];
+        let draggedPiece = null;
+
+        // Preguntas del quiz
+        const quizQuestions = [
+            {
+                question: "¿Cada cuánto tiempo se debe cambiar el aceite del motor?",
+                options: [
+                    "Cada 3,000 km o 3 meses",
+                    "Cada 10,000 km o 1 año",
+                    "Solo cuando se vea sucio",
+                    "Cada 5,000 km o 6 meses (lo que ocurra primero)"
+                ],
+                answer: 3,
+                explanation: "La mayoría de fabricantes recomiendan cambiar el aceite cada 5,000 km o 6 meses, aunque esto puede variar según el modelo."
+            },
+            {
+                question: "¿Qué indica la luz del check engine?",
+                options: [
+                    "Problemas con el motor",
+                    "Falla en el sistema eléctrico",
+                    "Ambas son correctas",
+                    "Necesidad de cambio de aceite"
+                ],
+                answer: 2,
+                explanation: "La luz del check engine puede indicar diversos problemas, desde fallos en el motor hasta problemas en el sistema eléctrico."
+            },
+            {
+                question: "¿Cuál es la presión adecuada para los neumáticos?",
+                options: [
+                    "La misma para todos los vehículos",
+                    "30 PSI siempre",
+                    "La que recomienda el fabricante",
+                    "Depende del clima"
+                ],
+                answer: 2,
+                explanation: "Cada vehículo tiene una presión recomendada por el fabricante, que suele encontrarse en el manual o en una pegatina en el marco de la puerta."
+            },
+            {
+                question: "¿Qué componente NO es parte del sistema de frenos?",
+                options: [
+                    "Discos de freno",
+                    "Pastillas de freno",
+                    "Banda de distribución",
+                    "Líquido de frenos"
+                ],
+                answer: 2,
+                explanation: "La banda de distribución es parte del sistema de transmisión, no del sistema de frenos."
+            },
+            {
+                question: "¿Cuándo se debe reemplazar el filtro de aire?",
+                options: [
+                    "Cada 10,000 km",
+                    "Cuando esté visiblemente sucio",
+                    "Según las recomendaciones del fabricante",
+                    "Nunca, es de por vida"
+                ],
+                answer: 2,
+                explanation: "Aunque hay intervalos generales, lo mejor es seguir las recomendaciones específicas del fabricante de tu vehículo."
+            }
+        ];
+
+        // Partes para el memorama
+        const memoryParts = [
+            { name: "Motor", icon: "bi-gear-wide", description: "Proporciona potencia al vehículo" },
+            { name: "Batería", icon: "bi-battery-full", description: "Proporciona energía eléctrica" },
+            { name: "Radiador", icon: "bi-thermometer-sun", description: "Enfría el motor" },
+            { name: "Frenos", icon: "bi-brake-pad", description: "Permiten detener el vehículo" },
+            { name: "Alternador", icon: "bi-lightning-charge", description: "Carga la batería" },
+            { name: "Transmisión", icon: "bi-gear", description: "Transmite potencia a las ruedas" },
+            { name: "Amortiguadores", icon: "bi-slash-circle", description: "Absorben impactos" },
+            { name: "Dirección", icon: "bi-steering-wheel", description: "Controla la dirección del vehículo" }
+        ];
+
+        // Partes para el juego de arrastrar y soltar
+        const engineParts = [
+            { id: 'bateria', name: 'Batería', icon: 'bi-battery-full', correctPosition: 'parte-delantera' },
+            { id: 'alternador', name: 'Alternador', icon: 'bi-lightning-charge', correctPosition: 'parte-frontal' },
+            { id: 'radiador', name: 'Radiador', icon: 'bi-thermometer-sun', correctPosition: 'parte-delantera' },
+            { id: 'filtro-aire', name: 'Filtro de Aire', icon: 'bi-fan', correctPosition: 'parte-superior' },
+            { id: 'aceite', name: 'Depósito de Aceite', icon: 'bi-droplet', correctPosition: 'parte-inferior' },
+            { id: 'bujias', name: 'Bujías', icon: 'bi-plug', correctPosition: 'parte-superior' }
+        ];
+
+        // Palabras para la sopa de letras
+        const wordsearchWords = [
+            'MOTOR', 'FRENOS', 'BATERIA', 'ACEITE', 'RUEDAS', 
+            'RADIADOR', 'ALTERNADOR', 'TRANSMISION', 'FILTRO', 'BUJIAS'
+        ];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar la sopa de letras
+            setupWordsearchGame();
+        });
+
+        // Función para mostrar el juego seleccionado
+        function startGame(game) {
+            // Ocultar todos los juegos
+            document.querySelectorAll('.game-container').forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // Ocultar la selección de juegos
+            document.querySelectorAll('#gamificacion > .row')[0].style.display = 'none';
+            
+            // Mostrar el juego seleccionado
+            document.getElementById(`${game}-game`).style.display = 'block';
+            
+            // Inicializar el juego si es necesario
+            if (game === 'quiz') {
+                resetQuiz();
+                loadQuestion(currentQuestion);
+            } else if (game === 'memory') {
+                setupMemoryGame();
+            } else if (game === 'dragdrop') {
+                setupDragdropGame();
+            } else if (game === 'wordsearch') {
+                setupWordsearchGame();
+            }
+        }
+
+        function closeGame(game) {
+            // Ocultar el juego
+            document.getElementById(`${game}-game`).style.display = 'none';
+            
+            // Mostrar la selección de juegos
+            document.querySelectorAll('#gamificacion > .row')[0].style.display = 'flex';
+        }
+
+        // Funciones para el Quiz
+        function resetQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            document.getElementById('quizResults').style.display = 'none';
+            document.getElementById('quizContainer').style.display = 'block';
+            document.getElementById('quizTotal').textContent = quizQuestions.length;
+            updateProgressBar();
+        }
+
+        function loadQuestion(index) {
+            if (index >= quizQuestions.length) {
+                showResults();
+                return;
+            }
+            
+            const question = quizQuestions[index];
+            document.getElementById('quizQuestion').textContent = `${index + 1}. ${question.question}`;
+            
+            const optionsContainer = document.getElementById('quizOptions');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, i) => {
+                const button = document.createElement('button');
+                button.className = 'btn btn-outline-primary text-start';
+                button.innerHTML = option;
+                button.onclick = () => selectOption(i, button);
+                optionsContainer.appendChild(button);
+            });
+            
+            document.getElementById('nextQuestion').disabled = true;
+            selectedOption = null;
+            updateProgressBar();
+        }
+
+        function selectOption(index, button) {
+            // Desmarcar todas las opciones
+            document.querySelectorAll('#quizOptions button').forEach(btn => {
+                btn.classList.remove('btn-primary');
+                btn.classList.add('btn-outline-primary');
+            });
+            
+            // Marcar la opción seleccionada
+            button.classList.remove('btn-outline-primary');
+            button.classList.add('btn-primary');
+            selectedOption = index;
+            document.getElementById('nextQuestion').disabled = false;
+        }
+
+        function nextQuestion() {
+            if (selectedOption === quizQuestions[currentQuestion].answer) {
+                score++;
+            }
+            
+            currentQuestion++;
+            loadQuestion(currentQuestion);
+        }
+
+        function updateProgressBar() {
+            const progress = (currentQuestion / quizQuestions.length) * 100;
+            document.getElementById('quizProgress').style.width = `${progress}%`;
+        }
+
+        function showResults() {
+            document.getElementById('quizContainer').style.display = 'none';
+            document.getElementById('quizResults').style.display = 'block';
+            document.getElementById('quizScore').textContent = score;
+            document.getElementById('quizTotal').textContent = quizQuestions.length;
+            
+            const feedback = document.getElementById('quizFeedback');
+            feedback.innerHTML = '';
+            
+            if (score === quizQuestions.length) {
+                feedback.innerHTML = '<p class="text-success">¡Perfecto! Eres un experto en autos.</p>';
+            } else if (score >= quizQuestions.length * 0.7) {
+                feedback.innerHTML = '<p class="text-success">¡Muy bien! Tienes buenos conocimientos.</p>';
+            } else if (score >= quizQuestions.length * 0.5) {
+                feedback.innerHTML = '<p class="text-warning">No está mal, pero puedes mejorar.</p>';
+            } else {
+                feedback.innerHTML = '<p class="text-danger">Necesitas estudiar más sobre autos.</p>';
+            }
+        }
+
+        function retryQuiz() {
+            resetQuiz();
+            loadQuestion(currentQuestion);
+        }
+
+        // Funciones para el Memorama
+        function setupMemoryGame() {
+            document.getElementById('memoryResults').style.display = 'none';
+            document.getElementById('memoryBoard').style.display = 'grid';
+            document.getElementById('memoryAttempts').textContent = '0';
+            document.getElementById('memoryMatches').textContent = '0';
+            
+            // Crear pares de cartas
+            memoryCards = [];
+            memoryParts.forEach((part, index) => {
+                memoryCards.push({ id: index * 2, part: part, matched: false });
+                memoryCards.push({ id: index * 2 + 1, part: part, matched: false });
+            });
+            
+            // Barajar las cartas
+            memoryCards.sort(() => Math.random() - 0.5);
+            
+            // Crear el tablero
+            const board = document.getElementById('memoryBoard');
+            board.innerHTML = '';
+            
+            memoryCards.forEach((card, index) => {
+                const cardElement = document.createElement('div');
+                cardElement.className = 'memory-card';
+                cardElement.dataset.index = index;
+                cardElement.innerHTML = `
+                    <div class="memory-card-inner">
+                        <div class="memory-card-front">
+                            <i class="bi bi-question-lg"></i>
+                        </div>
+                        <div class="memory-card-back">
+                            <i class="bi ${card.part.icon}"></i>
+                            <span>${card.part.name}</span>
+                            <small>${card.part.description}</small>
+                        </div>
+                    </div>
+                `;
+                cardElement.addEventListener('click', () => flipCard(cardElement, index));
+                board.appendChild(cardElement);
+            });
+            
+            flippedCards = [];
+            matchedPairs = 0;
+            attempts = 0;
+        }
+
+        function flipCard(cardElement, index) {
+            // Si ya hay dos cartas volteadas o esta carta ya está emparejada o volteada, no hacer nada
+            if (flippedCards.length === 2 || 
+                memoryCards[index].matched || 
+                cardElement.classList.contains('flipped')) {
+                return;
+            }
+            
+            // Voltear la carta
+            cardElement.classList.add('flipped');
+            flippedCards.push({ element: cardElement, index: index });
+            
+            // Si tenemos dos cartas volteadas, comprobar si son pareja
+            if (flippedCards.length === 2) {
+                attempts++;
+                document.getElementById('memoryAttempts').textContent = attempts;
+                
+                const card1 = memoryCards[flippedCards[0].index];
+                const card2 = memoryCards[flippedCards[1].index];
+                
+                if (card1.part.name === card2.part.name) {
+                    // Son pareja
+                    card1.matched = true;
+                    card2.matched = true;
+                    matchedPairs++;
+                    document.getElementById('memoryMatches').textContent = matchedPairs;
+                    
+                    flippedCards = [];
+                    
+                    // Comprobar si se ha completado el juego
+                    if (matchedPairs === memoryParts.length) {
+                        setTimeout(() => {
+                            document.getElementById('memoryBoard').style.display = 'none';
+                            document.getElementById('memoryResults').style.display = 'block';
+                            document.getElementById('finalAttempts').textContent = attempts;
+                        }, 1000);
+                    }
+                } else {
+                    // No son pareja, voltear de nuevo después de un tiempo
+                    setTimeout(() => {
+                        flippedCards.forEach(card => {
+                            card.element.classList.remove('flipped');
+                        });
+                        flippedCards = [];
+                    }, 1000);
+                }
+            }
+        }
+
+        function resetMemory() {
+            setupMemoryGame();
+        }
+
+        // Funciones para Arrastrar y Soltar
+        function setupDragdropGame() {
+            document.getElementById('dragdropResults').style.display = 'none';
+            document.getElementById('dragdropContainer').style.display = 'block';
+            
+            const piecesContainer = document.getElementById('dragdropPieces');
+            const targetContainer = document.getElementById('dragdropTarget');
+            
+            piecesContainer.innerHTML = '';
+            targetContainer.innerHTML = '';
+            
+            // Crear las piezas
+            engineParts.forEach(part => {
+                const piece = document.createElement('div');
+                piece.className = 'dragdrop-piece';
+                piece.id = part.id;
+                piece.draggable = true;
+                piece.innerHTML = `
+                    <i class="bi ${part.icon}"></i>
+                    <div>${part.name}</div>
+                `;
+                piece.addEventListener('dragstart', dragStart);
+                piecesContainer.appendChild(piece);
+            });
+            
+            // Crear los espacios de destino
+            const positions = ['parte-delantera', 'parte-frontal', 'parte-superior', 'parte-inferior'];
+            
+            positions.forEach(position => {
+                const slot = document.createElement('div');
+                slot.className = 'dragdrop-slot';
+                slot.dataset.position = position;
+                slot.innerHTML = `<small>${position.replace('-', ' ').toUpperCase()}</small>`;
+                
+                slot.addEventListener('dragover', dragOver);
+                slot.addEventListener('drop', drop);
+                slot.addEventListener('dragenter', dragEnter);
+                slot.addEventListener('dragleave', dragLeave);
+                
+                targetContainer.appendChild(slot);
+            });
+        }
+
+        function dragStart(e) {
+            draggedPiece = e.target;
+            e.dataTransfer.setData('text/plain', e.target.id);
+            setTimeout(() => {
+                e.target.style.opacity = '0.5';
+            }, 0);
+        }
+
+        function dragOver(e) {
+            e.preventDefault();
+        }
+
+        function dragEnter(e) {
+            e.preventDefault();
+            e.target.classList.add('highlight');
+        }
+
+        function dragLeave(e) {
+            e.target.classList.remove('highlight');
+        }
+
+        function drop(e) {
+            e.preventDefault();
+            e.target.classList.remove('highlight');
+            
+            const id = e.dataTransfer.getData('text/plain');
+            const piece = document.getElementById(id);
+            
+            // Restaurar la opacidad de la pieza
+            piece.style.opacity = '1';
+            
+            // Comprobar si la pieza se soltó en el lugar correcto
+            const part = engineParts.find(p => p.id === id);
+            const isCorrect = part.correctPosition === e.target.dataset.position;
+            
+            if (isCorrect) {
+                e.target.classList.add('correct');
+                e.target.innerHTML = piece.innerHTML;
+                
+                // Eliminar la pieza del contenedor de piezas
+                piece.remove();
+                
+                // Comprobar si todas las piezas están colocadas
+                const remainingPieces = document.querySelectorAll('#dragdropPieces .dragdrop-piece');
+                if (remainingPieces.length === 0) {
+                    document.getElementById('dragdropResults').style.display = 'block';
+                    document.getElementById('dragdropContainer').style.display = 'none';
+                }
+            } else {
+                e.target.classList.add('incorrect');
+                setTimeout(() => {
+                    e.target.classList.remove('incorrect');
+                }, 1000);
+            }
+        }
+
+        function resetDragdrop() {
+            setupDragdropGame();
+        }
+
+        // Funciones para la Sopa de Letras
+        function setupWordsearchGame() {
+            document.getElementById('wordsearchResults').style.display = 'none';
+            document.getElementById('wordsearchContainer').style.display = 'block';
+            
+            const grid = document.getElementById('wordsearchGrid');
+            const wordsContainer = document.getElementById('wordsearchWords');
+            
+            grid.innerHTML = '';
+            wordsContainer.innerHTML = '';
+            
+            // Crear la lista de palabras
+            wordsearchWords.forEach(word => {
+                const wordElement = document.createElement('div');
+                wordElement.className = 'wordsearch-word';
+                wordElement.textContent = word;
+                wordElement.dataset.word = word;
+                wordsContainer.appendChild(wordElement);
+            });
+            
+            document.getElementById('totalWords').textContent = wordsearchWords.length;
+            document.getElementById('wordsFound').textContent = '0';
+            
+            foundWords = [];
+            selectedCells = [];
+            
+            // Crear la cuadrícula (versión simplificada)
+            const gridSize = 12;
+            for (let i = 0; i < gridSize * gridSize; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'wordsearch-cell-new';
+                cell.textContent = String.fromCharCode(65 + Math.floor(Math.random() * 26));
+                cell.addEventListener('click', () => selectCell(cell));
+                grid.appendChild(cell);
+            }
+            
+            // Colocar algunas palabras en la cuadrícula (simulación)
+            // En una implementación real, se colocarían las palabras en direcciones aleatorias
+        }
+
+        function selectCell(cell) {
+            if (cell.classList.contains('selected')) {
+                cell.classList.remove('selected');
+                const index = selectedCells.indexOf(cell);
+                if (index > -1) {
+                    selectedCells.splice(index, 1);
+                }
+            } else {
+                cell.classList.add('selected');
+                selectedCells.push(cell);
+                
+                // Si tenemos 5 celdas seleccionadas, comprobar si forman una palabra
+                if (selectedCells.length >= 5) {
+                    checkWord();
+                }
+            }
+        }
+
+        function checkWord() {
+            // Simulación: encontrar una palabra aleatoria
+            const randomIndex = Math.floor(Math.random() * wordsearchWords.length);
+            const foundWord = wordsearchWords[randomIndex];
+            
+            if (!foundWords.includes(foundWord)) {
+                foundWords.push(foundWord);
+                document.getElementById('wordsFound').textContent = foundWords.length;
+                
+                // Marcar la palabra como encontrada
+                const wordElement = document.querySelector(`.wordsearch-word[data-word="${foundWord}"]`);
+                if (wordElement) {
+                    wordElement.classList.add('found');
+                }
+                
+                // Limpiar las celdas seleccionadas
+                selectedCells.forEach(cell => {
+                    cell.classList.remove('selected');
+                    cell.classList.add('found');
+                });
+                selectedCells = [];
+                
+                // Comprobar si se han encontrado todas las palabras
+                if (foundWords.length === wordsearchWords.length) {
+                    document.getElementById('wordsearchResults').style.display = 'block';
+                    document.getElementById('wordsearchContainer').style.display = 'none';
+                }
+            }
+        }
+
+        function resetWordSearch() {
+            setupWordsearchGame();
+        }
+
+        function showWordsearchWords() {
+            const wordsContainer = document.getElementById('wordsearchWords');
+            wordsContainer.style.display = wordsContainer.style.display === 'none' ? 'grid' : 'none';
+        }
+
+        // Inicializar el botón de siguiente pregunta
+        document.getElementById('nextQuestion').addEventListener('click', nextQuestion);
+    </script>
+</body>
+</html>
